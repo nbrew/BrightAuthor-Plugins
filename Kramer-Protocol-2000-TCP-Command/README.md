@@ -21,27 +21,38 @@ In BrightAuthor, while editing a presentation, open the Autorun presentation pro
 
 * **Advanced > Send > Send Plugin Message**. Select the "proto2k" plugin. In the parameters block, enter one of the following:
 
-  * **recall_preset**
+  * _recall_preset_ preset
+  * _switch_video_ input output
 
 
 ## General Command Format:
 
     proto2k!<command_name> <any inputs separated by spaces>
 
-    ' Protocol 2000 Recall Preset Example:
     ' Recall Preset 1
     proto2k!recall_preset 1
+        
+    ' Switch Video input 1 to output 2
+    proto2k!switch_video 1 2
 
-### **Recall Preset**
+### Recall Preset
 
-**Usage:** `proto2k!recall_preset <input number>`
-**Ex:** `proto2k!recall_preset 1`
-**Ex:** `proto2k!recall_preset 2`
+`proto2k!recall_preset <input number>`
 
+_ex:_ `proto2k!recall_preset 1`<br>
+_ex:_ `proto2k!recall_preset 2`
+
+### Switch Video
+
+`proto2k!switch_video <input number> <output number>[ <machine number>]`
+
+* **Switch Video Input 3 to Output 4**<br>
+`proto2k!switch_video 3 4`
+
+* **Switch Video Input 2 to Output 2**<br>
+`proto2k!switch_video 2 2`
 
 This plugin was developed independently of Kramer Electronics and is in no way
 associated with Kramer Electronics.
 
-# Future
 
-**Usage:** `proto2k!switch_video <input number> <output number>`

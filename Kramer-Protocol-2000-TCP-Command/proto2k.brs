@@ -10,7 +10,7 @@ Function proto2k_Initialize(msgPort As Object, userVariables As Object, bsp as O
 End Function
 
 Function newproto2k(msgPort As Object, userVariables As Object, bsp As Object)
-  print "newproto2k"
+  ' print "newproto2k"
   s = {}
   s.msgPort        = msgPort
   s.userVariables  = userVariables
@@ -21,7 +21,6 @@ Function newproto2k(msgPort As Object, userVariables As Object, bsp As Object)
   s.port  = 5000
   s.debug = true
 
-  ' SetParamsFromUserVariables(s, userVariables)
   ' set IP address from user variables
   if userVariables.DoesExist("proto2k_ip") then
     myvariable = userVariables.Lookup("proto2k_ip")
@@ -92,7 +91,6 @@ Function proto2k_ParsePluginMsg(msg As string, s As Object) as boolean
       fields    = r2.split(fields[1])
       numFields = fields.Count()
 
-      ' numFields = 2
       if fields[0] = "recall_preset" then
         if numFields < 2 or numFields > 3 then
           s.bsp.diagnostics.printdebug("proto2k Error: Number of fields for recall_preset must be 2 or 3."+fields[1])
@@ -114,7 +112,26 @@ Function proto2k_ParsePluginMsg(msg As string, s As Object) as boolean
         r2 = CreateObject("roRegex", "m", "i")
         command = r2.Replace(command, machineNum)
 
-      ' elseif fields[1] = "switch_video" then
+      elseif fields[0] = "switch_video" then
+        if numFields < 3 or numFields > 4 then
+          s.bsp.diagnostics.printdebug("proto2k Error: Number of fields for recall_preset must be 2 or 3."+fields[1])
+          return retval
+        endif
+        command = "01iom"
+        input  = Str(80 + StrToI(fields[1])).Trim()
+        output = Str(80 + StrToI(fields[2])).Trim()
+        if numFields = 3 then
+          machineNum = Str(80 + StrToI(fields[3])).Trim()
+        else
+          machineNum = "81"
+        endif
+
+        r2 = CreateObject("roRegex", "i", "i")
+        command = r2.Replace(command, input)
+        r2 = CreateObject("roRegex", "o", "i")
+        command = r2.Replace(command, output)
+        r2 = CreateObject("roRegex", "m", "i")
+        command = r2.Replace(command, machineNum)
       '
       ' else
       '   ' append %1 and \r\n to the command
