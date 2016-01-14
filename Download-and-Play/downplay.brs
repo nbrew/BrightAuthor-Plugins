@@ -1,8 +1,8 @@
 Function downplay_Initialize(msgPort As Object, userVariables As Object, bsp as Object)
 
-    print "downplay_Initialize - entry"
-    downplay = newdownplay(msgPort, userVariables, bsp)
-    return downplay
+	print "downplay_Initialize - entry"
+	downplay = newdownplay(msgPort, userVariables, bsp)
+	return downplay
 
 End Function
 
@@ -20,7 +20,7 @@ Function newdownplay(msgPort As Object, userVariables As Object, bsp as Object)
 	s.getimage = downplay_getimage
 	s.initimage = downplay_initimage
 	s.playimage = downplay_playimage
-	s.currentimage$ = "test.jpg"
+	s.currentimage$ = "media/logo.jpg"
 	s.imagepath$ = "http://dl.dropboxusercontent.com/u/3480052/video/2.jpg"
 	s.objectName = "downplay_object"
 	s.debug  = true
@@ -31,7 +31,7 @@ Function newdownplay(msgPort As Object, userVariables As Object, bsp as Object)
 
 
 	return s
-	
+
 End Function
 
 
@@ -49,11 +49,11 @@ Function downplay_ProcessEvent(event As Object) as boolean
 							'messageToParse$ = event["PluginName"]+"!"+pluginMessage$
 							m.dlog("Plugin Message: "+pluginMessage$)
 							retval = ParsedownplayPluginMsg(pluginMessage$, m)
-					
+
                 		endif
             		endif
         	endif
-		
+
 	else if type(event) = "roDatagramEvent" then
 		msg$ = event
 		m.dlog("UDP plugin event: "+msg$)
@@ -63,7 +63,7 @@ Function downplay_ProcessEvent(event As Object) as boolean
 
 	else if (type(event) = "roUrlEvent") then
 		m.bsp.diagnostics.printdebug("downplay_plugin Url Event")
-		
+
 		count=0
 
 		if event.GetSourceIdentity() = m.dimage.GetIdentity()
@@ -77,13 +77,13 @@ Function downplay_ProcessEvent(event As Object) as boolean
 			endif
 
 		endif
-		
+
 	else if type(event) = "roHttpEvent" then
 
 	else if type(event) = "roTimerEvent" then
 		'm.bsp.diagnostics.printdebug("downplay_plugin Timer Event")
 		'if event.GetSourceIdentity() = m.downplaytimer.GetIdentity()
-		
+
 	end if
 
 	return retval
@@ -95,7 +95,7 @@ End Function
 Function ParsedownplayPluginMsg(origMsg as string, s as object) as boolean
 	retval  = false
 	command = " "
-		
+
 	' convert the message to all lower case for easier string matching later
 	msg = lcase(origMsg)
 	print "Received Plugin message: "+msg
@@ -127,35 +127,40 @@ Function ParsedownplayPluginMsg(origMsg as string, s as object) as boolean
 	    	rebootsystem()
 	else if command = "stop"
 		if type(s.iplayer) = "roImagePlayer" then s.iplayer.stopdisplay()
-		
+
 	else if command <> " "
 		s.imagepath$ = command
-		s.currentimage$ = getname(command)
+		s.currentimage$ = "media/" + getname(command)
 		s.getimage(s.currentimage$)
 	endif
-	
+
 	return retval
 end Function
 
 
 Sub downplay_initimage()
 	m.dlog("debug - Initimage - Setting url, msgport")
-	
+
 	dimage = createobject("roUrlTransfer")
 	dimage.seturl(m.imagepath$)
 	dimage.setport(m.msgport)
-	
+
 	m.dimage = dimage
-	
+
 End Sub
 
 Sub downplay_getimage(file$ as string)
 	m.dlog("downplay Plugin - Get Image")
 	m.initimage()	'setting url
-	
+
 	if type(m.dimage) = "roUrlTransfer" then
-			ok = m.dimage.AsyncGetToFile(file$)
-			if ok = 0 then m.dlog("Error initiating downplay of " + file$)
+		ok = m.dimage.AsyncGetToFile(file$)
+		if ok = 0 then
+			m.dlog("Error initiating downplay of " + file$)
+		else
+			DeleteFile ("media/" + file$)
+			MoveFile(file$, m.currentimage$)
+		endif
 	endif
 
 	m.dlog("Completed - GetImage")
@@ -175,7 +180,7 @@ Sub downplay_dlog (error$ as String)
 	print error$
 	slog = createobject("roSystemLog")
 	slog.sendline(error$)
-	
+
 End Sub
 
 
@@ -189,7 +194,7 @@ Function getname (url$ as String) as String
 		endif
 	end while
 	print ("Name retrieved: "+url$)
-	
+
 	return url$
 
 End Function
