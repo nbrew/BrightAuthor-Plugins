@@ -1,3 +1,7 @@
+' 2015-01-14
+' modified - store files in media directory
+' modified - when a download is successful, remove any file with the same name
+'            inside the media folder then move the new download into place
 Function downplay_Initialize(msgPort As Object, userVariables As Object, bsp as Object)
 
 	print "downplay_Initialize - entry"
@@ -29,6 +33,7 @@ Function newdownplay(msgPort As Object, userVariables As Object, bsp as Object)
 	s.udpReceiver = CreateObject("roDatagramReceiver", s.udpReceiverPort)
 	s.udpReceiver.SetPort(msgPort)
 
+  CreateDirectory ("media")
 
 	return s
 
